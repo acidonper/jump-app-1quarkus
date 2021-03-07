@@ -47,6 +47,27 @@ You can then execute your native executable with: `./target/code-with-quarkus-1.
 
 If you want to learn more about building native executables, please consult https://quarkus.io/guides/maven-tooling.html.
 
+### Creating a native executable on MacOS
+
+- Install Dependencies
+```shell script
+brew install --cask graalvm/tap/graalvm-ce-java11
+export GRAALVM_HOME=/Library/Java/JavaVirtualMachines/graalvm-ce-java11-21.0.0/Contents/Home/
+xattr -r -d com.apple.quarantine ${GRAALVM_HOME}/../.. # Temporally
+${GRAALVM_HOME}/bin/gu install native-image
+```
+
+- Verify App
+```shell script
+mvn verify -Pnative
+mvn package -Pnative 
+```
+
+- Build and run container
+```shell script
+docker build -f src/main/docker/Dockerfile.native -t jump-app-quarkus:dev .
+docker run -i --rm -p 8080:8080 jump-app-quarkus:dev 
+```
 ## Test Jump App Quarkus API Locally
 
 - GET method to reach /
@@ -88,6 +109,90 @@ $ curl -XPOST -H "Content-type: application/json" -d '{
 {"code":200,"message":"/jump - Greetings from Quarkus!"}
 ```
 
+## Using s2i to build _Jump App Quarkus_ native image in Openshift
+
+It is possible to build Quarkus Native images using Openshift integrated tools in a simple manner. 
+
+Please, follow next steps to build an image in Openshift using s2i: 
+
+- Create an _ImageStream_ in Openshift to reference official Quarkus s2i GraalVM image
+
+```$bash
+cat << EOF > ubi-quarkus-native-s2i.yaml
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: ubi-quarkus-native-s2i
+spec:
+  lookupPolicy:
+    local: false
+  tags:
+  - annotations: null
+    from:
+      kind: DockerImage
+      name: quay.io/quarkus/ubi-quarkus-native-s2i:20.2.0-java11
+    generation: 1
+    importPolicy: {}
+    name: 20.2.0-java11
+    referencePolicy:
+      type: Source
+EOF
+oc apply -f ubi-quarkus-native-s2i.yaml
+```
+
+- Create an _ImageStream_ to allocate builds output
+
+```$bash
+cat << EOF > jump-app-quarkus.yaml
+apiVersion: image.openshift.io/v1
+kind: ImageStream
+metadata:
+  name: jump-app-quarkus
+spec:
+  lookupPolicy:
+    local: false
+EOF
+oc apply -f jump-app-quarkus.yaml
+```
+
+- Create a _BuildConfig_ to build the _Jump App Quarkus_ image
+
+```$bash
+cat << EOF > quarkus-bc.yaml
+apiVersion: build.openshift.io/v1
+kind: BuildConfig
+metadata:
+  name: quarkus
+spec:
+  nodeSelector: null
+  output:
+    to:
+      kind: ImageStreamTag
+      name: jump-app-quarkus:latest
+  postCommit: {}
+  resources: {}
+  source:
+    git:
+      uri: https://github.com/acidonper/jump-app-quarkus.git
+      ref: develop
+    type: Git
+  strategy:
+    sourceStrategy:
+      from:
+        kind: ImageStreamTag
+        name: ubi-quarkus-native-s2i
+    type: Source
+EOF
+oc apply -f quarkus-bc.yaml
+```
+
+- Trigger the _build_ process
+
+```$bash
+oc new-build quarkus
+```
+
+When this process is finished, a new image is available in the openshift project **image-registry.openshift-image-registry.svc:5000/<user_namespace>/jump-app-quarkus:latest**.
 
 ## Author Information
 
