@@ -88,6 +88,19 @@ $ curl -XPOST -H "Content-type: application/json" -d '{
 {"code":200,"message":"/jump - Greetings from Quarkus!"}
 ```
 
+- GET method to reach /load
+
+```$bash
+
+## Generate a load 
+# cpu - A number which is used to obtain the biggest primer number (Max - 999999999)
+# wait - The number of miliseconds to wait (Max - 999999999)
+# mem - The number of megabites loaded (Max - Depends on the resources)
+
+$ curl -X GET localhost:8080/load?cpu=999999999&wait=1000&mem=10
+{"code":200,"message":"/load - Greetings from Quarkus!"}
+```
+
 
 ## Author Information
 

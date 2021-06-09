@@ -20,13 +20,13 @@ public class LoadController {
 
         // Sleep
         if (wait != 0) {
-            System.out.println("Sleeping miliseconds:" + wait);
+            System.out.println("Sleeping miliseconds: " + wait);
             Thread.sleep(wait);
         }
 
         // Gen Memory consumption
         if (mem != 0) {
-            System.out.println("Generating memory load mb:" + mem);
+            System.out.println("Generating memory load mb: " + mem);
             byte[] b = new byte[mem];
             b[0] = 1;
             b[b.length - 1] = 1;
@@ -34,9 +34,10 @@ public class LoadController {
         }
 
         // Gen CPU Load
-        if (cpu <= 1) {
-            System.out.println("Generating CPU load obtaining the biggest Prime of the number:" + cpu);
-            int bigPrime = LoadCPU.biggestPrime(cpu);
+        if (cpu > 3) {
+            System.out.println("Generating CPU load obtaining the biggest Prime of the number: " + cpu);
+            int Bigprime = LoadCPU.biggestPrime(cpu);
+            System.out.println("The biggest Prime of the number: " + Bigprime);
         }
 
         // Generate Response Object
