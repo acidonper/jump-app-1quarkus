@@ -16,12 +16,15 @@ import java.util.Arrays;
 public class JumpsController {
 
     @GET
-    public Response jump() {
+    public Response jump() throws InterruptedException {
         // Logging
         System.out.println("Received GET /jump");
 
         // Generate Response Object
         Response response = new Response("/jump - Greetings from Quarkus!", 200);
+
+        // sleep
+        Thread.sleep(500);
 
         // Logging
         System.out.println("Sending GET Response /jump - " + response.toString());
