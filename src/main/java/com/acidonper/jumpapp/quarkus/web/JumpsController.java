@@ -3,6 +3,7 @@ package com.acidonper.jumpapp.quarkus.web;
 import com.acidonper.jumpapp.quarkus.entities.Jump;
 import com.acidonper.jumpapp.quarkus.entities.Response;
 import com.acidonper.jumpapp.quarkus.services.JumpClient;
+import com.acidonper.jumpapp.quarkus.services.LoadCPU;
 import org.eclipse.microprofile.rest.client.RestClientBuilder;
 
 import javax.ws.rs.*;
@@ -14,17 +15,14 @@ import java.util.Arrays;
 @Produces(MediaType.APPLICATION_JSON)
 @Consumes(MediaType.APPLICATION_JSON)
 public class JumpsController {
-
+    
     @GET
-    public Response jump() throws InterruptedException {
+    public Response jump(){
         // Logging
         System.out.println("Received GET /jump");
 
         // Generate Response Object
         Response response = new Response("/jump - Greetings from Quarkus!", 200);
-
-        // sleep
-        Thread.sleep(500);
 
         // Logging
         System.out.println("Sending GET Response /jump - " + response.toString());
