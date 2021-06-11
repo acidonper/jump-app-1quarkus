@@ -12,8 +12,8 @@ import javax.ws.rs.core.MediaType;
 public class LoadController {
 
     @GET
-    public Response load(@QueryParam("cpu") int cpu, @QueryParam("wait") int wait,
-                         @QueryParam("mem") int mem) throws InterruptedException {
+    public static Response load(@QueryParam("cpu") int cpu, @QueryParam("wait") int wait,
+                                @QueryParam("mem") int mem) throws InterruptedException {
 
         // Logging
         System.out.println("Received GET /load");
@@ -27,10 +27,7 @@ public class LoadController {
         // Gen Memory consumption
         if (mem != 0) {
             System.out.println("Generating memory load mb: " + mem);
-            byte[] b = new byte[mem];
-            b[0] = 1;
-            b[b.length - 1] = 1;
-
+            loadmem(mem);
         }
 
         // Gen CPU Load
@@ -46,6 +43,12 @@ public class LoadController {
         // Logging
         System.out.println("Sending GET Response /load - " + response.toString());
         return response;
+    }
+
+    static void loadmem(@QueryParam("mem") int mem) {
+        byte[] b = new byte[mem];
+        b[0] = 1;
+        b[b.length - 1] = 1;
     }
 
 
